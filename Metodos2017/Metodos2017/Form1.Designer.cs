@@ -1,5 +1,5 @@
 ﻿namespace Metodos2017 {
-    partial class Form1 {
+    partial class Ventana {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -28,6 +28,7 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.labelGradoCurva = new System.Windows.Forms.Label();
             this.textBoxGradoCurva = new System.Windows.Forms.TextBox();
             this.labelLogarithmicResult = new System.Windows.Forms.Label();
@@ -39,7 +40,8 @@
             this.labelInstruccionesAjuste = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.labelExponencialHeader = new System.Windows.Forms.Label();
+            this.labelExponencialResultado = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
@@ -47,6 +49,9 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(-2, 12);
@@ -57,6 +62,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.labelExponencialResultado);
+            this.tabPage1.Controls.Add(this.labelExponencialHeader);
             this.tabPage1.Controls.Add(this.chart);
             this.tabPage1.Controls.Add(this.labelGradoCurva);
             this.tabPage1.Controls.Add(this.textBoxGradoCurva);
@@ -74,6 +81,27 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Ajuste de Curvas";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // chart
+            // 
+            this.chart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea1.Name = "ChartArea1";
+            this.chart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart.Legends.Add(legend1);
+            this.chart.Location = new System.Drawing.Point(423, 40);
+            this.chart.Margin = new System.Windows.Forms.Padding(3, 3, 3, 80);
+            this.chart.Name = "chart";
+            this.chart.Padding = new System.Windows.Forms.Padding(0, 0, 0, 20);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart.Series.Add(series1);
+            this.chart.Size = new System.Drawing.Size(901, 660);
+            this.chart.TabIndex = 9;
+            this.chart.Text = "chart1";
             // 
             // labelGradoCurva
             // 
@@ -94,7 +122,7 @@
             // labelLogarithmicResult
             // 
             this.labelLogarithmicResult.AutoSize = true;
-            this.labelLogarithmicResult.Location = new System.Drawing.Point(38, 694);
+            this.labelLogarithmicResult.Location = new System.Drawing.Point(32, 676);
             this.labelLogarithmicResult.Name = "labelLogarithmicResult";
             this.labelLogarithmicResult.Size = new System.Drawing.Size(70, 25);
             this.labelLogarithmicResult.TabIndex = 6;
@@ -103,7 +131,7 @@
             // labelLogarithmicHeader
             // 
             this.labelLogarithmicHeader.AutoSize = true;
-            this.labelLogarithmicHeader.Location = new System.Drawing.Point(32, 669);
+            this.labelLogarithmicHeader.Location = new System.Drawing.Point(30, 651);
             this.labelLogarithmicHeader.Name = "labelLogarithmicHeader";
             this.labelLogarithmicHeader.Size = new System.Drawing.Size(224, 25);
             this.labelLogarithmicHeader.TabIndex = 5;
@@ -147,7 +175,9 @@
             this.textBoxValoresAjuste.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxValoresAjuste.Size = new System.Drawing.Size(326, 310);
             this.textBoxValoresAjuste.TabIndex = 1;
+            this.textBoxValoresAjuste.TextChanged += new System.EventHandler(this.p);
             this.textBoxValoresAjuste.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxValoresAjuste_KeyPress);
+            this.textBoxValoresAjuste.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxValoresAjuste_KeyUp);
             // 
             // labelInstruccionesAjuste
             // 
@@ -163,34 +193,36 @@
             this.tabPage2.Location = new System.Drawing.Point(8, 39);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1381, 498);
+            this.tabPage2.Size = new System.Drawing.Size(1381, 872);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Intersección";
+            this.tabPage2.Text = "Dream Team";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // chart
+            // labelExponencialHeader
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart.Legends.Add(legend1);
-            this.chart.Location = new System.Drawing.Point(423, 103);
-            this.chart.Name = "chart";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart.Series.Add(series1);
-            this.chart.Size = new System.Drawing.Size(901, 660);
-            this.chart.TabIndex = 9;
-            this.chart.Text = "chart1";
+            this.labelExponencialHeader.AutoSize = true;
+            this.labelExponencialHeader.Location = new System.Drawing.Point(37, 755);
+            this.labelExponencialHeader.Name = "labelExponencialHeader";
+            this.labelExponencialHeader.Size = new System.Drawing.Size(225, 25);
+            this.labelExponencialHeader.TabIndex = 10;
+            this.labelExponencialHeader.Text = "Ecuación Exponencial";
             // 
-            // Form1
+            // labelExponencialResultado
+            // 
+            this.labelExponencialResultado.AutoSize = true;
+            this.labelExponencialResultado.Location = new System.Drawing.Point(42, 784);
+            this.labelExponencialResultado.Name = "labelExponencialResultado";
+            this.labelExponencialResultado.Size = new System.Drawing.Size(70, 25);
+            this.labelExponencialResultado.TabIndex = 11;
+            this.labelExponencialResultado.Text = "label1";
+            // 
+            // Ventana
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1407, 938);
             this.Controls.Add(this.tabControl1);
-            this.Name = "Form1";
+            this.Name = "Ventana";
             this.Text = "Metodos Dream Team";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -216,6 +248,8 @@
         private System.Windows.Forms.TextBox textBoxGradoCurva;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart;
+        private System.Windows.Forms.Label labelExponencialResultado;
+        private System.Windows.Forms.Label labelExponencialHeader;
     }
 }
 

@@ -16,7 +16,7 @@ namespace Metodos2017 {
         Exponencial
     };
 
-    public partial class Form1 : Form {
+    public partial class Ventana : Form {
         char[] exponentes = {
             '\x2070',   //x^0
             '\xB9',     //x^1
@@ -30,7 +30,7 @@ namespace Metodos2017 {
             '\x2079',   //x^9
         };
 
-        public Form1() {
+        public Ventana() {
             InitializeComponent();
             chart.Series.Clear();
         }
@@ -44,7 +44,9 @@ namespace Metodos2017 {
                 matrizBModificada; // Arreglo que contiene los valores de la matriz Bmod 
 
             double[] matrizResultados, // Arreglo que contiene los resultados del ajuste polinomial
-                    logaritmoResultados;
+                    logaritmoResultados,
+                    exponencialResultados,
+                    valoresX;
 
             string resultado = "";
 
@@ -60,10 +62,21 @@ namespace Metodos2017 {
                     mostrarError("El grado máximo para la ecuación es " +
                            (valores.GetLength(0) - 1));
                     return;
+                } else if (short.Parse(textBoxGradoCurva.Text) > 9) {
+                    mostrarError("El grado máximo del programa es 9");
+                    return;
                 }
             } catch (Exception) {
                 mostrarError("Favor de introducir el grado correctamente.");
                 return;
+            }
+
+            valoresX = new double[valores.GetLength(0)];
+            for (int i = 0; i < valores.GetLength(0); i++) valoresX[i] = valores[i, 0];
+
+            if (valoresX.Length != valoresX.Distinct().Count()) {
+                mostrarError("No se permiten valores duplicados en el eje x."); // Hay valores duplicados de x
+                return; // Cancelar la función
             }
 
             // Llenar la matriz A
@@ -111,16 +124,53 @@ namespace Metodos2017 {
 
             labelLogarithmicResult.Text = string.Format("{0:0.######} + {1:0.######} ln x\nR\xB2: {2:0.######}", logaritmoResultados[0], logaritmoResultados[1], rCuadrada);
 
-            llenarGrafica(valores, matrizResultados, logaritmoResultados);
+            exponencialResultados = calcularExponencial(valores);
+
+            rCuadrada = calcularRCuadrada(TipoEcuacion.Exponencial, exponencialResultados, valores);
+
+            labelExponencialResultado.Text = string.Format("{0:0.######} * e^({1:0.######}x)\nR\xB2: {2:0.######}", exponencialResultados[0], exponencialResultados[1], rCuadrada);
+            
+            llenarGrafica(valores, matrizResultados, logaritmoResultados, exponencialResultados);
         }
 
         private void ponerPuntos() {
             chart.Series.Clear();
 
+            Series puntos = new Series {
+                Name = "puntos",
+                Color = Color.DarkRed,
+                MarkerSize = 10,
+                IsVisibleInLegend = false,
+                IsXValueIndexed = false,
+                ChartType = SeriesChartType.Point
+            };
+
+            string[] textoValores = textBoxValoresAjuste.Lines;
+
+            textoValores = textoValores.Where(item => item != "").ToArray();
+
+            double[,] valores = new double[textoValores.Length, 2];
+
+            for (int i = 0; i < textoValores.Length; i++) {
+                try {
+                    string puntoActual = textoValores[i].Trim();
+                    string[] puntoSeparado = puntoActual.Split(',');
+                    for (int j = 0; j < 2; j++) {
+                        valores[i, j] = double.Parse(puntoSeparado[j]);
+                    }
+                    puntos.Points.AddXY(valores[i, 0], valores[i, 1]);
+                } catch {
+                     
+                }
+                
+            }
+
+            chart.Series.Add(puntos);
+
             chart.Invalidate();
         }
 
-        private void llenarGrafica(double[,] valores, double[] coeficientesPolinomio, double[] coeficientesLogaritmo) {
+        private void llenarGrafica(double[,] valores, double[] coeficientesPolinomio, double[] coeficientesLogaritmo, double[] coeficientesExponencial) {
             double[] valoresX = new double[valores.GetLength(0)];
             double step;
 
@@ -129,7 +179,7 @@ namespace Metodos2017 {
             Array.Sort(valoresX);
 
             Series puntos = new Series {
-                Name = "puntos",
+                Name = "Puntos",
                 Color = Color.DarkRed,
                 MarkerSize = 10,
                 IsVisibleInLegend = false,
@@ -155,22 +205,36 @@ namespace Metodos2017 {
                 ChartType = SeriesChartType.Line
             };
 
+            Series exponencial = new Series {
+                Name = "Exponencial",
+                Color = Color.Red,
+                BorderWidth = 3,
+                IsVisibleInLegend = true,
+                IsXValueIndexed = false,
+                ChartType = SeriesChartType.Line
+            };
+
             chart.Series.Clear();
 
             chart.Series.Add(puntos);
             chart.Series.Add(polimonio);
             chart.Series.Add(logaritmo);
+            chart.Series.Add(exponencial);
 
             for (int i = 0; i < valoresX.Length; i++) {
-                puntos.Points.AddXY(valores[i, 0], valores[i, 1]);
+                if(valores[i , 0] > 0)
+                    puntos.Points.AddXY(valores[i, 0], valores[i, 1]);
             }
 
             step = (valoresX[valoresX.Length - 1] - valoresX[0]) / 100;
 
 
             for (double i = valoresX[0]; i < valoresX[valoresX.Length - 1]; i+= step) {
-                polimonio.Points.AddXY(i, evaluarPolinomio(coeficientesPolinomio, i));
-                logaritmo.Points.AddXY(i, evaluarLogaritmo(coeficientesLogaritmo, i));
+                if (i > 0) { 
+                    polimonio.Points.AddXY(i, evaluarPolinomio(coeficientesPolinomio, i));
+                    logaritmo.Points.AddXY(i, evaluarLogaritmo(coeficientesLogaritmo, i));
+                    exponencial.Points.AddXY(i, evaluarExponencial(coeficientesExponencial, i));
+                }
             }
 
             chart.Invalidate();
@@ -186,6 +250,10 @@ namespace Metodos2017 {
 
         private double evaluarLogaritmo(double[] coeficientes, double x) {
             return coeficientes[0] + coeficientes[1] * Math.Log(x);
+        }
+
+        private double evaluarExponencial(double[] coeficientes, double x) {
+            return coeficientes[0] * Math.Exp(coeficientes[1] * x);
         }
 
         private double calcularRCuadrada(TipoEcuacion tipoEcuacion, double[] coeficientes, double[,] valores) {
@@ -218,7 +286,7 @@ namespace Metodos2017 {
                         px = evaluarLogaritmo(coeficientes, valores[i, 0]);
                     }
                 } else {
-                    // is logaritmo
+                    px = evaluarExponencial(coeficientes, valores[i, 0]);
                 }
                 sumaY += Math.Pow(valores[i, 1] - yPromedio, 2);
                 sumaPx += Math.Pow(valores[i, 1] - px, 2);
@@ -349,8 +417,6 @@ namespace Metodos2017 {
             return ab;
         }
 
-
-
         private void textBoxValoresAjuste_KeyPress(object sender, KeyPressEventArgs e) {
             bool isValid = char.IsDigit(e.KeyChar) || char.IsControl(e.KeyChar) || char.IsWhiteSpace(e.KeyChar);
             if (!isValid) {
@@ -360,6 +426,40 @@ namespace Metodos2017 {
                     e.Handled = true;
                 }
             }
+        }
+
+        private double[] calcularExponencial(double[,] valores) {
+            double[] ab = new double[2];
+            double xSqySum = 0,
+                   ylnySum = 0,
+                   xySum = 0,
+                   xylnySum = 0,
+                   ySum = 0;
+
+            for (int i = 0; i < valores.GetLength(0); i++) {
+                double x = valores[i, 0],
+                    y = valores[i, 1];
+
+                xSqySum += y * Math.Pow(x, 2);
+                ylnySum += Math.Log(y) * y;
+                xySum += x * y;
+                xylnySum += Math.Log(y) * x * y;
+                ySum += y;
+
+            }
+
+            ab[0] = Math.Exp((xSqySum * ylnySum - xySum * xylnySum) / (ySum * xSqySum - Math.Pow(xySum, 2)));
+            ab[1] = (ySum * xylnySum - xySum * ylnySum) / (ySum * xSqySum - Math.Pow(xySum, 2));
+
+            return ab;
+        }
+
+        private void textBoxValoresAjuste_KeyUp(object sender, KeyEventArgs e) {
+            ponerPuntos();
+        }
+
+        private void p(object sender, EventArgs e) {
+
         }
     }
 }
